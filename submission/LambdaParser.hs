@@ -20,41 +20,48 @@ import Data.Builder
 -- | Parses a string representing a lambda calculus expression in long form
 --
 -- >>> parse longLambdaP "(λx.xx)"
--- Just (\x.xx,"")
+-- Result >< \x.xx
 --
 -- >>> parse longLambdaP "(λx.(λy.xy(xx)))"
--- Just (\xy.xy(xx),"")
+-- Result >< \xy.xy(xx)
 --
--- >>> parse longLambdaP "xx"
--- Nothing
+-- >>> parse longLambdaP "(λx(λy.x))"
+-- UnexpectedChar '('
+
 longLambdaP :: Parser Lambda
 longLambdaP = undefined
 
 -- | Parses a string representing a lambda calculus expression in short form
 --
 -- >>> parse shortLambdaP "λx.xx"
--- Just (\x.xx,"")
+-- Result >< \x.xx
 --
 -- >>> parse shortLambdaP "λxy.xy(xx)"
--- Just (\xy.xy(xx),"")
+-- Result >< \xy.xy(xx)
 --
 -- >>> parse shortLambdaP "λx.x(λy.yy)"
--- Just (\x.x\y.yy,"")
+-- Result >< \x.x\y.yy
 --
 -- >>> parse shortLambdaP "(λx.x)(λy.yy)"
--- Just ((\x.x)\y.yy,"")
+-- Result >< (\x.x)\y.yy
+--
+-- >>> parse shortLambdaP "λxyz"
+-- UnexpectedEof
+
 shortLambdaP :: Parser Lambda
 shortLambdaP = undefined
 
 -- | Parses a string representing a lambda calculus expression in short or long form
 -- >>> parse lambdaP "λx.xx"
--- Just (\x.xx,"")
+-- Result >< \x.xx
 --
 -- >>> parse lambdaP "(λx.xx)"
--- Just (\x.xx,"")
+-- Result >< \x.xx
 --
--- >>> parse lambdaP "xx"
--- Nothing
+-- >>> parse lambdaP "λx..x"
+-- UnexpectedChar '.'
+--
+
 lambdaP :: Parser Lambda
 lambdaP = undefined
 
@@ -76,13 +83,13 @@ lambdaP = undefined
 -- >>> lamToBool <$> parse logicP "not not not False"
 -- Result >< Just True
 --
--- >>> parse logicP "True and"
--- Result >< Just ((\xy.(\btf.btf)xy\_f.f)\t_.t,"")
+-- >>> parse logicP "True and False"
+-- Result >< (\xy.(\btf.btf)xy\_f.f)(\t_.t)\_f.f
 --
 -- >>> parse logicP "not False"
--- Just ((\x.(\btf.btf)x(\_f.f)\t_.t)\_f.f,"")
--- >>> lamToBool . fst =<< parse logicP "if True and not False then True or True else False"
--- Just True
+-- Result >< (\x.(\btf.btf)x(\_f.f)\t_.t)\_f.f
+-- >>> lamToBool <$> parse logicP "if True and not False then True or True else False"
+-- Result >< Just True
 
 logicP :: Parser Lambda
 logicP = undefined
@@ -130,11 +137,11 @@ arithmeticP = undefined
 -- | The helper function you'll need is:
 -- | isZero = λn.n(λx.False)True
 
--- >>> lamToBool . fst =<< parse complexCalcP "9 - 2 <= 3 + 6"
--- Just True
+-- >>> lamToBool <$> parse complexCalcP "9 - 2 <= 3 + 6"
+-- Result >< Just True
 --
--- >>> lamToBool . fst =<< parse complexCalcP "15 - 2 * 2 != 2**3 + 3 or 5 * 3 + 1 < 9"
--- Just False
+-- >>> lamToBool <$> parse complexCalcP "15 - 2 * 2 != 2**3 + 3 or 5 * 3 + 1 < 9"
+-- Result >< Just False
 complexCalcP :: Parser Lambda
 complexCalcP = undefined
 
@@ -153,30 +160,30 @@ complexCalcP = undefined
 -- | tail = λlcn.l(λhtg.gh(tc))(λt.n)(λht.t)
 --
 -- >>> parse listP "[]"
--- Just (\cn.n,"")
+-- Result >< \cn.n
 --
 -- >>> parse listP "[True]"
--- Just ((\htcn.ch(tcn))(\xy.x)\cn.n,"")
+-- Result >< (\htcn.ch(tcn))(\xy.x)\cn.n
 --
 -- >>> parse listP "[0, 0]"
--- Just ((\htcn.ch(tcn))(\fx.x)((\htcn.ch(tcn))(\fx.x)\cn.n),"")
+-- Result >< (\htcn.ch(tcn))(\fx.x)((\htcn.ch(tcn))(\fx.x)\cn.n)
 --
 -- >>> parse listP "[0, 0"
--- Nothing
+-- UnexpectedEof
 listP :: Parser Lambda
 listP = undefined
 
--- >>> lamToBool . fst =<< parse listOpP "head [True, False, True, False, False]"
--- Just True
+-- >>> lamToBool <$> parse listOpP "head [True, False, True, False, False]"
+-- Result >< Just True
 --
--- >>> lamToBool . fst =<< parse listOpP "head rest [True, False, True, False, False]"
--- Just False
+-- >>> lamToBool <$> parse listOpP "head rest [True, False, True, False, False]"
+-- Result >< Just False
 --
--- >>> lamToBool . fst =<< parse listOpP "isNull []"
--- Just True
+-- >>> lamToBool <$> parse listOpP "isNull []"
+-- Result >< Just True
 --
--- >>> lamToBool . fst =<< parse listOpP "isNull [1, 2, 3]"
--- Just False
+-- >>> lamToBool <$> parse listOpP "isNull [1, 2, 3]"
+-- Result >< Just False
 listOpP :: Parser Lambda
 listOpP = undefined
 

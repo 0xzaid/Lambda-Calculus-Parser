@@ -16,3 +16,9 @@ Initial release with
 - Submission skeleton code with deliverable functions defined
   - Including some tests
 - Brief troubleshooting steps in readme
+
+## 0.1.0.1 - 2022-09-30
+
+Release with
+
+- Updated test suite for parse result
